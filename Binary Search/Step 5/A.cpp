@@ -24,37 +24,40 @@ ll inv(long long i){
     return i <= 1 ? i : MOD - (MOD / i) * inv(MOD % i) % MOD;
 }
 
-void solve(){
-    int n, k;
-    std::cin >> n >> k;
-    std::vector<std::pair<int, int>> a(n);
+bool good(const std::vector<std::pair<int, int>>& a, ll k, ll m){
+    ll cnt = 0;
+    for (const auto& [l, r] : a){
+        if (m >= l)
+            cnt += std::min(m, 1LL * (r + 1)) - l;
+    }
 
+    // std::cout << m << ' ' << cnt << '\n';
+
+    return cnt <= k;
+}
+
+void solve(){
+    ll n, k;
+    std::cin >> n >> k;
+
+    std::vector<std::pair<int, int>> a(n);
     for (int i=0;i<n;i++){
         std::cin >> a[i].first >> a[i].second;
     }
 
-    double low = 0;
-    double high = 1e5 + 1;
+    ll low = -2 * 1e9 - 1;
+    ll high = 2 * 1e9 + 1;
 
-    for (int i=0;i<100;i++){
-        if (high - low < 1e-6) break;
-        auto mid = (low + high) / 2;
+    while (low + 1 < high){
+        auto mid = (low + high) >> 1;
 
-        std::vector<double> v(n);
-        for (int i=0;i<n;i++){
-            v[i] = a[i].first - mid * a[i].second;
-        }
-
-        std::sort(v.rbegin(), v.rend());
-        auto sum = std::accumulate(v.begin(), v.begin() + k, 0.0);
-
-        if (sum >= 0)
+        if (good(a, k, mid))
             low = mid;
         else 
             high = mid;
     }
 
-    std::cout << std::setprecision(10) << low << '\n';
+    std::cout << low << '\n';
 }      
 
 int main(){

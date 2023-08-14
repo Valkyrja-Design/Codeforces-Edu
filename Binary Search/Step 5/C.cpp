@@ -24,37 +24,48 @@ ll inv(long long i){
     return i <= 1 ? i : MOD - (MOD / i) * inv(MOD % i) % MOD;
 }
 
-void solve(){
-    int n, k;
-    std::cin >> n >> k;
-    std::vector<std::pair<int, int>> a(n);
+bool good(const std::vector<ll>& a, const std::vector<ll>& b, ll n, ll k, ll m){
+    ll cnt = 0;
 
-    for (int i=0;i<n;i++){
-        std::cin >> a[i].first >> a[i].second;
+    for (auto x : a){
+        // we count the elements b_i such that 
+        // x + b_i < m -> b_i < m - x
+        ll want = m - x;
+        auto j = std::lower_bound(b.begin(), b.end(), want) - b.begin();
+        cnt += j;
     }
 
-    double low = 0;
-    double high = 1e5 + 1;
+    return cnt <= k - 1;
+}
 
-    for (int i=0;i<100;i++){
-        if (high - low < 1e-6) break;
-        auto mid = (low + high) / 2;
+void solve(){
+    ll n, k;
+    std::cin >> n >> k;
 
-        std::vector<double> v(n);
-        for (int i=0;i<n;i++){
-            v[i] = a[i].first - mid * a[i].second;
-        }
+    std::vector<ll> a(n), b(n);
+    for (int i=0;i<n;i++){
+        std::cin >> a[i];
+    }
+    for (int i=0;i<n;i++){
+        std::cin >> b[i];
+    }
 
-        std::sort(v.rbegin(), v.rend());
-        auto sum = std::accumulate(v.begin(), v.begin() + k, 0.0);
+    std::sort(a.begin(), a.end());
+    std::sort(b.begin(), b.end());
 
-        if (sum >= 0)
+    ll low = 0;
+    ll high = 1e10;
+
+    while (low + 1 < high){
+        auto mid = (low + high) >> 1;
+
+        if (good(a, b, n, k, mid))
             low = mid;
         else 
             high = mid;
     }
 
-    std::cout << std::setprecision(10) << low << '\n';
+    std::cout << low << '\n';
 }      
 
 int main(){
